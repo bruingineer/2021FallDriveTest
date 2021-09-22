@@ -23,8 +23,8 @@ public class Robot extends TimedRobot {
 
   // Slew rate limiters to make joystick inputs more gentle; 1/3 sec from 0
   // to 1.
-  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(6);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(6);
 
   private final Drivetrain m_drive = new Drivetrain();
   private final RamseteController m_ramsete = new RamseteController();
@@ -51,17 +51,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_timer.reset();
-    m_timer.start();
-    m_drive.resetOdometry(m_trajectory.getInitialPose());
+    // m_timer.reset();
+    // m_timer.start();
+    // m_drive.resetOdometry(m_trajectory.getInitialPose());
   }
 
   @Override
   public void autonomousPeriodic() {
-    double elapsed = m_timer.get();
-    Trajectory.State reference = m_trajectory.sample(elapsed);
-    ChassisSpeeds speeds = m_ramsete.calculate(m_drive.getPose(), reference);
-    m_drive.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
+    // double elapsed = m_timer.get();
+    // Trajectory.State reference = m_trajectory.sample(elapsed);
+    // ChassisSpeeds speeds = m_ramsete.calculate(m_drive.getPose(), reference);
+    // m_drive.drive(speeds.vxMetersPerSecond, speeds.omegaRadiansPerSecond);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
     // negative values when we push forward.
     double temp_y_left = util.deadband(m_controller.getY(GenericHID.Hand.kLeft), 0.1);
     double xSpeed =
-        -m_speedLimiter.calculate(m_controller.getY(GenericHID.Hand.kLeft)) * Drivetrain.kMaxSpeed;
+        -m_speedLimiter.calculate(temp_y_left) * Drivetrain.kMaxSpeed;
 
     // Get the rate of angular rotation. We are inverting this because we want a
     // positive value when we pull to the left (remember, CCW is positive in

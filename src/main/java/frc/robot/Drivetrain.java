@@ -32,7 +32,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 @SuppressWarnings("PMD.TooManyFields")
 public class Drivetrain {
   // 3 meters per second.
-  public static final double kMaxSpeed = 1.5;
+  public static final double kMaxSpeed = 1.0;
   // 1/2 rotation per second.
   public static final double kMaxAngularSpeed = Math.PI;
 
@@ -56,17 +56,17 @@ public class Drivetrain {
   private final PIDController m_leftPIDController = new PIDController(2, 0, 0);
   private final PIDController m_rightPIDController = new PIDController(2, 0, 0);
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  // private final AnalogGyro m_gyro = new AnalogGyro(0);
 
   private final DifferentialDriveKinematics m_kinematics = new DifferentialDriveKinematics(kTrackWidth);
-  private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
+  // private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
 
   // Gains are for example purposes only - must be determined for your own
   // robot!
-  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(1, 3);
+  private final SimpleMotorFeedforward m_feedforward = new SimpleMotorFeedforward(0.1, 0.2);
 
   // Simulation classes help us simulate our robot
-  private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
+  // private final AnalogGyroSim m_gyroSim = new AnalogGyroSim(m_gyro);
   // private final EncoderSim m_leftEncoderSim = new EncoderSim(m_leftEncoder);
   // private final EncoderSim m_rightEncoderSim = new EncoderSim(m_rightEncoder);
   private final Field2d m_fieldSim = new Field2d();
@@ -105,8 +105,8 @@ public class Drivetrain {
     m_leftLeader.setSelectedSensorPosition(0);
     m_rightLeader.setSelectedSensorPosition(0);
     // m_rightGroup.setInverted(true);
-    m_leftLeader.setInverted(InvertType.None);
-    m_rightLeader.setInverted(InvertType.InvertMotorOutput);
+    m_leftLeader.setInverted(InvertType.InvertMotorOutput);
+    m_rightLeader.setInverted(InvertType.None);
     SmartDashboard.putData("Field", m_fieldSim);
   }
 
@@ -124,8 +124,8 @@ public class Drivetrain {
 
     // m_leftGroup.setVoltage(leftOutput + leftFeedforward);
     // m_rightGroup.setVoltage(rightOutput + rightFeedforward);
-    m_leftLeader.setVoltage(leftOutput + leftFeedforward);
-    m_rightLeader.setVoltage(rightOutput + rightFeedforward);
+    m_leftLeader.setVoltage(leftOutput);//+ leftFeedforward);
+    m_rightLeader.setVoltage(rightOutput);//+ rightFeedforward);
   }
 
   /**
@@ -141,9 +141,9 @@ public class Drivetrain {
 
   /** Update robot odometry. */
   public void updateOdometry() {
-    m_odometry.update(
-        // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
-        m_gyro.getRotation2d(), m_leftLeader.getSelectedSensorPosition()/kEncoderTicksPerMeter, m_rightLeader.getSelectedSensorPosition()/kEncoderTicksPerMeter);
+    // m_odometry.update(
+    //     // m_gyro.getRotation2d(), m_leftEncoder.getDistance(), m_rightEncoder.getDistance());
+    //     m_gyro.getRotation2d(), m_leftLeader.getSelectedSensorPosition()/kEncoderTicksPerMeter, m_rightLeader.getSelectedSensorPosition()/kEncoderTicksPerMeter);
        
   }
 
@@ -154,13 +154,13 @@ public class Drivetrain {
     m_leftLeader.setSelectedSensorPosition(0);
     m_rightLeader.setSelectedSensorPosition(0);
     m_drivetrainSimulator.setPose(pose);
-    m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+    // m_odometry.resetPosition(pose, m_gyro.getRotation2d());
   }
 
   /** Check the current robot pose. */
-  public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
-  }
+  // public Pose2d getPose() {
+    // return m_odometry.getPoseMeters();
+  // }
 
   /** Update our simulation. This should be run every robot loop in simulation. */
   public void simulationPeriodic() {
@@ -187,6 +187,6 @@ public class Drivetrain {
   /** Update odometry - this should be run every robot loop. */
   public void periodic() {
     updateOdometry();
-    m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
+    // m_fieldSim.setRobotPose(m_odometry.getPoseMeters());
   }
 }
